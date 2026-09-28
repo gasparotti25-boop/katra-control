@@ -2,659 +2,442 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+  <title>KATRA 6 - Control de Entradas</title>
 
-  <title>KATRA - Control de Entradas</title>
-
-  <!-- Lector QR -->
-  <script src="https://unpkg.com/html5-qrcode"
-          type="text/javascript"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      min-height: 100vh;
-      padding: 20px;
-
-      background: #080808;
-      color: white;
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
       text-align: center;
     }
 
     .contenedor {
-      width: 100%;
-      max-width: 430px;
-
-      margin: 30px auto;
-
-      background: #151515;
-
-      padding: 25px;
-
-      border-radius: 22px;
-
-      box-shadow:
-        0 15px 50px rgba(0,0,0,.6);
+      max-width: 500px;
+      margin: auto;
+      padding: 25px 15px;
     }
 
     h1 {
-      margin: 0 0 8px;
-
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 32px;
+      margin-bottom: 5px;
+      letter-spacing: 2px;
     }
 
-    h2 {
-      margin: 0 0 25px;
-
-      font-size: 20px;
-      font-weight: normal;
-
-      color: #cccccc;
+    .subtitulo {
+      color: #aaa;
+      margin-bottom: 25px;
     }
 
     input {
-      width: 100%;
-
-      padding: 16px;
-
-      margin-bottom: 15px;
-
+      width: 90%;
+      padding: 15px;
+      border-radius: 10px;
       border: none;
-
-      border-radius: 12px;
-
       font-size: 18px;
-
-      text-align: center;
-
-      outline: none;
+      margin-bottom: 15px;
+      box-sizing: border-box;
     }
 
     button {
-      width: 100%;
-
-      padding: 16px;
-
-      margin-top: 8px;
-
+      width: 90%;
+      padding: 15px;
       border: none;
-
-      border-radius: 12px;
-
-      background: white;
-
-      color: black;
-
+      border-radius: 10px;
       font-size: 18px;
-
       font-weight: bold;
-
       cursor: pointer;
+      margin-top: 10px;
     }
 
-    button:active {
-      transform: scale(.98);
+    #btnLogin {
+      background: #fff;
+      color: #000;
     }
 
-    #lector {
+    #btnOtra {
+      background: #fff;
+      color: #000;
       display: none;
     }
 
-    #qr-reader {
+    #reader {
       width: 100%;
-
-      margin: 20px auto;
-
-      overflow: hidden;
-
-      border-radius: 18px;
-
-      background: #000;
+      margin-top: 20px;
     }
 
     #resultado {
-      margin-top: 20px;
-
+      margin-top: 25px;
       padding: 20px;
-
-      border-radius: 16px;
-
-      font-size: 18px;
-
-      line-height: 1.5;
-
-      min-height: 80px;
-    }
-
-    .esperando {
-      background: #222;
+      border-radius: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 30px;
     }
 
     .valida {
-      background: #075b2b;
-
-      border: 2px solid #25d366;
+      background: #0b6b35;
     }
 
+    .usada,
     .invalida {
-      background: #741717;
-
-      border: 2px solid #ff4444;
+      background: #9b1c1c;
     }
 
-    .error {
-      margin-top: 12px;
-
-      color: #ff5555;
-
-      font-weight: bold;
-    }
-
-    .info {
-      margin-top: 15px;
-
-      color: #999;
-
-      font-size: 14px;
+    .validando {
+      background: #444;
     }
 
     .oculto {
-      display: none !important;
+      display: none;
     }
 
+    .info {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: normal;
+    }
   </style>
 </head>
 
-
 <body>
 
+<div class="contenedor">
 
-  <!-- ======================= -->
+  <h1>KATRA 6</h1>
+  <div class="subtitulo">CONTROL DE ENTRADAS</div>
+
   <!-- LOGIN -->
-  <!-- ======================= -->
-
-  <div
-    class="contenedor"
-    id="login">
-
-    <h1>🎟️ KATRA</h1>
-
-    <h2>
-      Control de entradas
-    </h2>
-
+  <div id="login">
     <input
-      id="clave"
       type="password"
-      placeholder="Ingresá la clave"
-      autocomplete="off"
+      id="password"
+      placeholder="Contraseña"
     >
 
-    <button
-      id="btnIngresar"
-      type="button">
-
+    <button id="btnLogin" onclick="ingresar()">
       INGRESAR
-
     </button>
-
-    <div
-      id="errorLogin"
-      class="error">
-    </div>
-
   </div>
 
+  <!-- CONTROL -->
+  <div id="control" class="oculto">
 
-  <!-- ======================= -->
-  <!-- LECTOR -->
-  <!-- ======================= -->
+    <div id="reader"></div>
 
-  <div
-    class="contenedor"
-    id="lector">
+    <div id="resultado"></div>
 
-    <h1>🎟️ KATRA</h1>
-
-    <h2>
-      Control de entradas
-    </h2>
-
-    <p>
-      Apuntá la cámara al código QR.
-    </p>
-
-    <div id="qr-reader"></div>
-
-
-    <div
-      id="resultado"
-      class="esperando">
-
-      📷 Esperando QR...
-
-    </div>
-
-
-    <button
-      id="btnOtra"
-      type="button"
-      class="oculto">
-
+    <button id="btnOtra" onclick="otraEntrada()">
       ESCANEAR OTRA ENTRADA
-
     </button>
-
-
-    <div class="info">
-
-      El QR se validará automáticamente.
-
-    </div>
 
   </div>
 
+</div>
 
 <script>
 
-
   /*
-   * =================================
-   * CONFIGURACIÓN
-   * =================================
+   * URL DE GOOGLE APPS SCRIPT
    */
-
-
-  const CLAVE =
-    "KATRA2026";
-
-
-  /*
-   * IMPORTANTE:
-   *
-   * Más adelante vamos a poner acá
-   * la URL de tu Apps Script.
-   *
-   * NO LA CAMBIES TODAVÍA.
-   */
-
   const APPS_SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbzg5uNzLEhkKjGSZnthsh9Izw-d_txoA3QcXq0ziVg1D8tMeQOTL4shOKfFJlIntMhe7w/exec";
 
 
+  /*
+   * CONTRASEÑA DEL CONTROL
+   */
+  const PASSWORD = "KATRA2026";
+
+
   let scanner = null;
-
   let procesando = false;
-
-  let camaraActiva = false;
-
 
 
   /*
-   * =================================
    * LOGIN
-   * =================================
    */
+  function ingresar() {
 
+    const password =
+      document.getElementById("password").value;
 
-  document
-    .getElementById("btnIngresar")
-    .addEventListener(
-      "click",
-      entrar
-    );
+    if (password !== PASSWORD) {
 
-
-  document
-    .getElementById("clave")
-    .addEventListener(
-      "keydown",
-      function(e) {
-
-        if (e.key === "Enter") {
-
-          entrar();
-
-        }
-
-      }
-    );
-
-
-  function entrar() {
-
-    const clave =
-      document
-        .getElementById("clave")
-        .value
-        .trim();
-
-
-    const error =
-      document
-        .getElementById("errorLogin");
-
-
-    if (clave !== CLAVE) {
-
-      error.textContent =
-        "Clave incorrecta.";
-
+      alert("Contraseña incorrecta");
       return;
 
     }
 
+    document.getElementById("login").classList.add("oculto");
 
-    error.textContent = "";
-
-
-    document
-      .getElementById("login")
-      .style.display =
-      "none";
-
-
-    document
-      .getElementById("lector")
-      .style.display =
-      "block";
-
+    document.getElementById("control").classList.remove("oculto");
 
     iniciarScanner();
 
   }
 
 
-
   /*
-   * =================================
-   * INICIAR SCANNER
-   * =================================
+   * INICIAR CÁMARA
    */
-
-
   function iniciarScanner() {
-
-    const resultado =
-      document
-        .getElementById("resultado");
-
-
-    resultado.className =
-      "esperando";
-
-
-    resultado.innerHTML =
-      "📷 Iniciando cámara...";
-
-
-    document
-      .getElementById("btnOtra")
-      .classList
-      .add("oculto");
-
 
     procesando = false;
 
+    document.getElementById("resultado").innerHTML = "";
+
+    document.getElementById("resultado").className = "";
+
+    document.getElementById("btnOtra").style.display = "none";
+
+
+    scanner = new Html5Qrcode("reader");
+
+
+    scanner.start(
+
+      {
+        facingMode: "environment"
+      },
+
+      {
+        fps: 10,
+        qrbox: {
+          width: 280,
+          height: 280
+        }
+      },
+
+      (decodedText) => {
+
+        procesarQR(decodedText);
+
+      },
+
+      (errorMessage) => {
+
+        // Ignoramos errores normales de lectura
+
+      }
+
+    ).catch((error) => {
+
+      mostrarResultado(
+        "NO SE PUDO ABRIR LA CÁMARA",
+        "invalida"
+      );
+
+      console.error(error);
+
+    });
+
+  }
+
+
+  /*
+   * CUANDO SE DETECTA UN QR
+   */
+  function procesarQR(codigo) {
+
+    if (procesando) return;
+
+    procesando = true;
+
+
+    document.getElementById("resultado").className = "validando";
+
+    document.getElementById("resultado").innerHTML =
+      "VALIDANDO QR...";
+
 
     /*
-     * Limpiar scanner anterior
+     * Frenamos la cámara para evitar
+     * leer el mismo QR varias veces.
      */
-
     if (scanner) {
 
-      try {
-
-        scanner.stop();
-
-      } catch(e) {}
-
-
-      try {
-
-        scanner.clear();
-
-      } catch(e) {}
-
-
-      scanner = null;
+      scanner.stop().catch(() => {});
 
     }
 
 
-    /*
-     * Crear nuevo lector
-     */
+    validarEnAppsScript(codigo);
 
-    scanner =
-      new Html5Qrcode(
-        "qr-reader"
-      );
+  }
 
 
-    const configuracion = {
+  /*
+   * CONSULTA A GOOGLE APPS SCRIPT
+   *
+   * Usamos JSONP porque GitHub Pages
+   * y Apps Script están en dominios diferentes.
+   */
+  function validarEnAppsScript(codigo) {
 
-      fps: 10,
+    const callbackName =
+      "katraQRCallback_" + Date.now();
 
-      qrbox: {
-        width: 260,
-        height: 260
-      },
 
-      aspectRatio: 1.0
+    let script;
+
+
+    window[callbackName] = function(respuesta) {
+
+      delete window[callbackName];
+
+
+      if (script && script.parentNode) {
+
+        script.parentNode.removeChild(script);
+
+      }
+
+
+      if (respuesta && respuesta.ok) {
+
+        mostrarResultado(
+
+          "✓ ENTRADA VÁLIDA",
+
+          "valida",
+
+          respuesta
+
+        );
+
+      } else {
+
+        mostrarResultado(
+
+          "✕ " + (
+            respuesta?.mensaje ||
+            "QR INVÁLIDO"
+          ),
+
+          respuesta?.mensaje === "ENTRADA YA UTILIZADA"
+            ? "usada"
+            : "invalida",
+
+          respuesta
+
+        );
+
+      }
+
+
+      document.getElementById("btnOtra").style.display =
+        "block";
 
     };
 
 
-    /*
-     * Abrir cámara
-     */
-
-    scanner
-      .start(
-
-        {
-          facingMode: "environment"
-        },
-
-        configuracion,
+    script = document.createElement("script");
 
 
-        /*
-         * QR ENCONTRADO
-         */
-
-        function(codigo) {
-
-          if (procesando) {
-
-            return;
-
-          }
+    script.src =
+      APPS_SCRIPT_URL +
+      "?accion=validarQR" +
+      "&codigo=" +
+      encodeURIComponent(codigo) +
+      "&callback=" +
+      encodeURIComponent(callbackName);
 
 
-          procesando = true;
+    script.onerror = function() {
+
+      delete window[callbackName];
 
 
-          procesarQR(codigo);
+      if (script && script.parentNode) {
 
-        },
+        script.parentNode.removeChild(script);
 
-
-        /*
-         * Errores normales
-         * mientras busca QR
-         */
-
-        function(error) {
-
-          // No hacemos nada.
-
-        }
-
-      )
+      }
 
 
-      .then(function() {
+      mostrarResultado(
 
-        camaraActiva = true;
+        "ERROR DE CONEXIÓN",
 
+        "invalida"
 
-        resultado.className =
-          "esperando";
-
-
-        resultado.innerHTML =
-          "📷 <strong>CÁMARA ACTIVA</strong>" +
-          "<br><br>" +
-          "Apuntá al QR.";
-
-      })
+      );
 
 
-      .catch(function(error) {
+      document.getElementById("btnOtra").style.display =
+        "block";
 
-        camaraActiva = false;
-
-
-        resultado.className =
-          "invalida";
+    };
 
 
-        resultado.innerHTML =
-          "❌ <strong>ERROR DE CÁMARA</strong>" +
-          "<br><br>" +
-          (error.message ||
-           error);
-
-
-        console.error(error);
-
-      });
+    document.body.appendChild(script);
 
   }
 
 
-
   /*
-   * =================================
-   * PROCESAR QR
-   * =================================
+   * MOSTRAR RESULTADO
    */
-
-
-  function procesarQR(codigo) {
+  function mostrarResultado(mensaje, clase, datos) {
 
     const resultado =
-      document
-        .getElementById("resultado");
+      document.getElementById("resultado");
 
 
-    resultado.className =
-      "esperando";
+    resultado.className = clase;
 
 
-    resultado.innerHTML =
-      "⏳ <strong>QR DETECTADO</strong>" +
-      "<br><br>" +
-      "Validando entrada...";
+    let html = mensaje;
 
 
-    /*
-     * Detener cámara
-     */
+    if (datos && datos.nombre) {
 
-    if (
-      scanner &&
-      camaraActiva
-    ) {
-
-      scanner
-        .stop()
-        .then(function() {
-
-          camaraActiva = false;
-
-        })
-        .catch(function() {
-
-          camaraActiva = false;
-
-        });
+      html +=
+        '<div class="info">' +
+        datos.nombre +
+        '</div>';
 
     }
 
 
-    /*
-     * =================================
-     * POR AHORA MOSTRAMOS EL CÓDIGO
-     * =================================
-     *
-     * En el siguiente paso conectamos
-     * esto con Apps Script.
-     */
+    if (datos && datos.tipo) {
+
+      html +=
+        '<div class="info">' +
+        "Tipo: " +
+        datos.tipo +
+        '</div>';
+
+    }
 
 
-    console.log(
-      "QR LEÍDO:",
-      codigo
-    );
-
-
-    resultado.className =
-      "valida";
-
-
-    resultado.innerHTML =
-      "🟢 <strong>QR LEÍDO</strong>" +
-      "<br><br>" +
-      "<small>" +
-      codigo +
-      "</small>";
-
-
-    document
-      .getElementById("btnOtra")
-      .classList
-      .remove("oculto");
+    resultado.innerHTML = html;
 
   }
 
 
-
   /*
-   * =================================
-   * ESCANEAR OTRA
-   * =================================
+   * ESCANEAR OTRA ENTRADA
    */
+  function otraEntrada() {
+
+    document.getElementById("resultado").innerHTML = "";
+
+    document.getElementById("resultado").className = "";
+
+    document.getElementById("btnOtra").style.display =
+      "none";
 
 
-  document
-    .getElementById("btnOtra")
-    .addEventListener(
-      "click",
-      function() {
+    iniciarScanner();
 
-        iniciarScanner();
-
-      }
-    );
-
+  }
 
 </script>
 
