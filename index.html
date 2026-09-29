@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>KATRA 6 - Control de Entradas</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <title>KATRA 6 - Control</title>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
       background: #000;
       color: #fff;
+      font-family: Arial, sans-serif;
       text-align: center;
     }
 
@@ -25,8 +31,8 @@
 
     h1 {
       font-size: 32px;
-      margin-bottom: 5px;
       letter-spacing: 2px;
+      margin-bottom: 5px;
     }
 
     .subtitulo {
@@ -36,12 +42,12 @@
 
     input {
       width: 90%;
+      box-sizing: border-box;
       padding: 15px;
-      border-radius: 10px;
       border: none;
+      border-radius: 10px;
       font-size: 18px;
       margin-bottom: 15px;
-      box-sizing: border-box;
     }
 
     button {
@@ -51,18 +57,18 @@
       border-radius: 10px;
       font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
       margin-top: 10px;
+      cursor: pointer;
     }
 
     #btnLogin {
-      background: #fff;
-      color: #000;
+      background: white;
+      color: black;
     }
 
     #btnOtra {
-      background: #fff;
-      color: #000;
+      background: white;
+      color: black;
       display: none;
     }
 
@@ -72,7 +78,7 @@
     }
 
     #resultado {
-      margin-top: 25px;
+      margin-top: 20px;
       padding: 20px;
       border-radius: 15px;
       font-size: 22px;
@@ -81,12 +87,15 @@
     }
 
     .valida {
-      background: #0b6b35;
+      background: #087f3f;
     }
 
-    .usada,
+    .usada {
+      background: #a40000;
+    }
+
     .invalida {
-      background: #9b1c1c;
+      background: #a40000;
     }
 
     .validando {
@@ -102,7 +111,9 @@
       font-size: 16px;
       font-weight: normal;
     }
+
   </style>
+
 </head>
 
 <body>
@@ -110,29 +121,47 @@
 <div class="contenedor">
 
   <h1>KATRA 6</h1>
-  <div class="subtitulo">CONTROL DE ENTRADAS</div>
+
+  <div class="subtitulo">
+    CONTROL DE ENTRADAS
+  </div>
+
 
   <!-- LOGIN -->
+
   <div id="login">
+
     <input
       type="password"
       id="password"
       placeholder="Contraseña"
     >
 
-    <button id="btnLogin" onclick="ingresar()">
+    <button
+      id="btnLogin"
+      onclick="ingresar()"
+    >
       INGRESAR
     </button>
+
   </div>
 
+
   <!-- CONTROL -->
-  <div id="control" class="oculto">
+
+  <div
+    id="control"
+    class="oculto"
+  >
 
     <div id="reader"></div>
 
     <div id="resultado"></div>
 
-    <button id="btnOtra" onclick="otraEntrada()">
+    <button
+      id="btnOtra"
+      onclick="otraEntrada()"
+    >
       ESCANEAR OTRA ENTRADA
     </button>
 
@@ -140,166 +169,232 @@
 
 </div>
 
+
 <script>
 
-  /*
-   * URL DE GOOGLE APPS SCRIPT
-   */
-  const APPS_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbzg5uNzLEhkKjGSZnthsh9Izw-d_txoA3QcXq0ziVg1D8tMeQOTL4shOKfFJlIntMhe7w/exec";
+
+/*************************************************
+ * CONFIGURACIÓN
+ *************************************************/
+
+const APPS_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzg5uNzLEhkKjGSZnthsh9Izw-d_txoA3QcXq0ziVg1D8tMeQOTL4shOKfFJlIntMhe7w/exec";
 
 
-  /*
-   * CONTRASEÑA DEL CONTROL
-   */
-  const PASSWORD = "KATRA2026";
+const PASSWORD = "KATRA2026";
 
 
-  let scanner = null;
-  let procesando = false;
+let scanner = null;
+
+let procesando = false;
 
 
-  /*
-   * LOGIN
-   */
-  function ingresar() {
+/*************************************************
+ * LOGIN
+ *************************************************/
 
-    const password =
-      document.getElementById("password").value;
+function ingresar() {
 
-    if (password !== PASSWORD) {
+  const password =
+    document.getElementById("password").value;
 
-      alert("Contraseña incorrecta");
-      return;
 
-    }
+  if (password !== PASSWORD) {
 
-    document.getElementById("login").classList.add("oculto");
+    alert("Contraseña incorrecta");
 
-    document.getElementById("control").classList.remove("oculto");
-
-    iniciarScanner();
+    return;
 
   }
 
 
-  /*
-   * INICIAR CÁMARA
-   */
-  function iniciarScanner() {
-
-    procesando = false;
-
-    document.getElementById("resultado").innerHTML = "";
-
-    document.getElementById("resultado").className = "";
-
-    document.getElementById("btnOtra").style.display = "none";
+  document
+    .getElementById("login")
+    .classList
+    .add("oculto");
 
 
-    scanner = new Html5Qrcode("reader");
+  document
+    .getElementById("control")
+    .classList
+    .remove("oculto");
 
 
-    scanner.start(
+  iniciarScanner();
 
-      {
-        facingMode: "environment"
-      },
+}
 
-      {
-        fps: 10,
-        qrbox: {
-          width: 280,
-          height: 280
-        }
-      },
 
-      (decodedText) => {
+/*************************************************
+ * INICIAR ESCÁNER
+ *************************************************/
 
-        procesarQR(decodedText);
+function iniciarScanner() {
 
-      },
+  procesando = false;
 
-      (errorMessage) => {
 
-        // Ignoramos errores normales de lectura
+  document
+    .getElementById("resultado")
+    .className = "";
 
+
+  document
+    .getElementById("resultado")
+    .innerHTML = "";
+
+
+  document
+    .getElementById("btnOtra")
+    .style.display = "none";
+
+
+  scanner =
+    new Html5Qrcode("reader");
+
+
+  scanner.start(
+
+    {
+      facingMode: "environment"
+    },
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 280,
+        height: 280
       }
 
-    ).catch((error) => {
+    },
 
-      mostrarResultado(
-        "NO SE PUDO ABRIR LA CÁMARA",
-        "invalida"
-      );
+    function(codigo) {
 
-      console.error(error);
+      procesarQR(codigo);
 
-    });
+    },
 
-  }
+    function(error) {
 
-
-  /*
-   * CUANDO SE DETECTA UN QR
-   */
-  function procesarQR(codigo) {
-
-    if (procesando) return;
-
-    procesando = true;
-
-
-    document.getElementById("resultado").className = "validando";
-
-    document.getElementById("resultado").innerHTML =
-      "VALIDANDO QR...";
-
-
-    /*
-     * Frenamos la cámara para evitar
-     * leer el mismo QR varias veces.
-     */
-    if (scanner) {
-
-      scanner.stop().catch(() => {});
-
+      // errores normales del escaneo
     }
 
+  ).catch(function(error) {
 
-    validarEnAppsScript(codigo);
+    mostrarResultado(
+      "NO SE PUDO ABRIR LA CÁMARA",
+      "invalida"
+    );
+
+    console.error(error);
+
+  });
+
+}
+
+
+/*************************************************
+ * QR DETECTADO
+ *************************************************/
+
+function procesarQR(codigo) {
+
+  if (procesando) {
+    return;
+  }
+
+
+  procesando = true;
+
+
+  mostrarResultado(
+    "VALIDANDO QR...",
+    "validando"
+  );
+
+
+  /*
+   * Paramos la cámara.
+   */
+
+  if (scanner) {
+
+    scanner
+      .stop()
+      .catch(function() {});
 
   }
 
 
   /*
-   * CONSULTA A GOOGLE APPS SCRIPT
-   *
-   * Usamos JSONP porque GitHub Pages
-   * y Apps Script están en dominios diferentes.
+   * AHORA SÍ:
+   * mandamos el código a Apps Script.
    */
-  function validarEnAppsScript(codigo) {
 
-    const callbackName =
-      "katraQRCallback_" + Date.now();
+  validarEnAppsScript(codigo);
 
-
-    let script;
+}
 
 
-    window[callbackName] = function(respuesta) {
+/*************************************************
+ * VALIDAR EN GOOGLE APPS SCRIPT
+ *************************************************/
+
+function validarEnAppsScript(codigo) {
+
+  const callbackName =
+    "katraQR_" + Date.now();
+
+
+  let script = null;
+
+
+  /*
+   * Esta función recibe la respuesta
+   * de Google Apps Script.
+   */
+
+  window[callbackName] =
+    function(respuesta) {
+
+
+      /*
+       * Eliminamos callback.
+       */
 
       delete window[callbackName];
 
 
-      if (script && script.parentNode) {
+      /*
+       * Eliminamos script.
+       */
 
-        script.parentNode.removeChild(script);
+      if (
+        script &&
+        script.parentNode
+      ) {
+
+        script.parentNode
+          .removeChild(script);
 
       }
 
 
-      if (respuesta && respuesta.ok) {
+      console.log(
+        "RESPUESTA APPS SCRIPT:",
+        respuesta
+      );
+
+
+      /*
+       * ENTRADA VÁLIDA
+       */
+
+      if (
+        respuesta &&
+        respuesta.ok === true
+      ) {
 
         mostrarResultado(
 
@@ -311,18 +406,26 @@
 
         );
 
-      } else {
+      }
+
+
+      /*
+       * ENTRADA YA UTILIZADA
+       */
+
+      else if (
+
+        respuesta &&
+        respuesta.mensaje ===
+          "ENTRADA YA UTILIZADA"
+
+      ) {
 
         mostrarResultado(
 
-          "✕ " + (
-            respuesta?.mensaje ||
-            "QR INVÁLIDO"
-          ),
+          "✕ ENTRADA YA UTILIZADA",
 
-          respuesta?.mensaje === "ENTRADA YA UTILIZADA"
-            ? "usada"
-            : "invalida",
+          "usada",
 
           respuesta
 
@@ -331,113 +434,180 @@
       }
 
 
-      document.getElementById("btnOtra").style.display =
-        "block";
+      /*
+       * CUALQUIER OTRO ERROR
+       */
+
+      else {
+
+        mostrarResultado(
+
+          "✕ " +
+          (
+            respuesta?.mensaje ||
+            "QR INVÁLIDO"
+          ),
+
+          "invalida",
+
+          respuesta
+
+        );
+
+      }
+
+
+      document
+        .getElementById("btnOtra")
+        .style.display = "block";
 
     };
 
 
-    script = document.createElement("script");
+  /*
+   * Creamos la llamada JSONP.
+   */
+
+  script =
+    document.createElement("script");
 
 
-    script.src =
-      APPS_SCRIPT_URL +
-      "?accion=validarQR" +
-      "&codigo=" +
-      encodeURIComponent(codigo) +
-      "&callback=" +
-      encodeURIComponent(callbackName);
+  script.src =
+    APPS_SCRIPT_URL +
+    "?accion=validarQR" +
+    "&codigo=" +
+    encodeURIComponent(codigo) +
+    "&callback=" +
+    callbackName;
 
 
-    script.onerror = function() {
+  console.log(
+    "URL DE VALIDACIÓN:",
+    script.src
+  );
+
+
+  /*
+   * Si Apps Script no responde.
+   */
+
+  script.onerror =
+    function() {
+
 
       delete window[callbackName];
 
 
-      if (script && script.parentNode) {
+      if (
+        script &&
+        script.parentNode
+      ) {
 
-        script.parentNode.removeChild(script);
+        script.parentNode
+          .removeChild(script);
 
       }
 
 
       mostrarResultado(
-
-        "ERROR DE CONEXIÓN",
-
+        "ERROR DE CONEXIÓN CON GOOGLE",
         "invalida"
-
       );
 
 
-      document.getElementById("btnOtra").style.display =
-        "block";
+      document
+        .getElementById("btnOtra")
+        .style.display = "block";
 
     };
 
 
-    document.body.appendChild(script);
+  document
+    .body
+    .appendChild(script);
+
+}
+
+
+/*************************************************
+ * MOSTRAR RESULTADO
+ *************************************************/
+
+function mostrarResultado(
+  mensaje,
+  clase,
+  datos
+) {
+
+  const resultado =
+    document.getElementById(
+      "resultado"
+    );
+
+
+  resultado.className = clase;
+
+
+  let html = mensaje;
+
+
+  if (
+    datos &&
+    datos.nombre
+  ) {
+
+    html +=
+      '<div class="info">' +
+      datos.nombre +
+      '</div>';
 
   }
 
 
-  /*
-   * MOSTRAR RESULTADO
-   */
-  function mostrarResultado(mensaje, clase, datos) {
+  if (
+    datos &&
+    datos.tipo
+  ) {
 
-    const resultado =
-      document.getElementById("resultado");
-
-
-    resultado.className = clase;
-
-
-    let html = mensaje;
-
-
-    if (datos && datos.nombre) {
-
-      html +=
-        '<div class="info">' +
-        datos.nombre +
-        '</div>';
-
-    }
-
-
-    if (datos && datos.tipo) {
-
-      html +=
-        '<div class="info">' +
-        "Tipo: " +
-        datos.tipo +
-        '</div>';
-
-    }
-
-
-    resultado.innerHTML = html;
+    html +=
+      '<div class="info">' +
+      "Tipo: " +
+      datos.tipo +
+      '</div>';
 
   }
 
 
-  /*
-   * ESCANEAR OTRA ENTRADA
-   */
-  function otraEntrada() {
+  resultado.innerHTML = html;
 
-    document.getElementById("resultado").innerHTML = "";
-
-    document.getElementById("resultado").className = "";
-
-    document.getElementById("btnOtra").style.display =
-      "none";
+}
 
 
-    iniciarScanner();
+/*************************************************
+ * ESCANEAR OTRA
+ *************************************************/
 
-  }
+function otraEntrada() {
+
+  document
+    .getElementById("resultado")
+    .innerHTML = "";
+
+
+  document
+    .getElementById("resultado")
+    .className = "";
+
+
+  document
+    .getElementById("btnOtra")
+    .style.display = "none";
+
+
+  iniciarScanner();
+
+}
+
 
 </script>
 
